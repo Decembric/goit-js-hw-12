@@ -5,16 +5,12 @@ const lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   enableKeyboard: true,
 });
+import { hitsContainer } from "../main";
 
-
-const hitsContainer = document.querySelector('.gallery');
-
-export { hitsContainer, render }; 
-function render(hits) {
+export default function render(hits) {
   hitsContainer.innerHTML = '';
   const hitsRef = hits.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
-    return `<div class="gallery">
-            <ul>
+    return `<ul>
         <li><a href="${largeImageURL}"><img src="${webformatURL}" alt="${tags}"/></a></li>
           <li><p>Likes ${likes}</p></li>
           <li>
@@ -22,8 +18,7 @@ function render(hits) {
           </li>
           <li><p>Comments ${comments}</p></li>
           <li><p>Downloads ${downloads}</p></li>
-        </ul>
-        </div>`
+        </ul>`
   });
   hitsContainer.insertAdjacentHTML('beforeend', hitsRef.join(''));
   lightbox.refresh();
