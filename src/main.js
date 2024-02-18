@@ -22,24 +22,26 @@ let currentQuery = '';
 let currentPage
 let availablePages = 0;
 
-onHideLoaderText();
+// onHideLoaderText();
 
-function onShowLoaderText() {
-    loaderRef.style.display = 'block';
+// function onShowLoaderText() {
+//     loaderRef.style.display = 'block';
     
-}
+// }
 
-function onHideLoaderText() {
-    loaderRef.style.display = 'none';
-}
+// function onHideLoaderText() {
+//     loaderRef.style.display = 'none';
+// }
 
 function onButtonLoaderShow() {
-  loadMoreButtonRef.style.display = 'show';
+  loadMoreButtonRef.style.display = 'block';
 }
 
 function onButtonLoaderHide() {
   loadMoreButtonRef.style.display = 'none';
 }
+
+onButtonLoaderHide()
 
 loadMoreButtonRef.addEventListener('click', onLoadMore)
 
@@ -85,8 +87,11 @@ async function onInputQuery(evt) {
     inputQueryRef.value = "";
     if (totalHits !== 0) {
       render(hits);
-      onHideLoaderText();
+      lightbox.refresh()
+      onButtonLoaderShow()
+      availablePages = Math.ceil(totalHits / 15);
     } else {
+      onButtonLoaderHide()
       hitsContainer.innerHTML = "";
       noImage()
     };
@@ -102,28 +107,25 @@ window.scrollBy({
     
 async function onLoadMore() {
   try {
-    onShowLoaderText()
+    // onShowLoaderText()
     currentPage += 1;
     const {hits, totalHits} = await getPicture(currentQuery, currentPage)
     if (totalHits !== 0) {
       render(hits);
-      onHideLoaderText();
+      // onHideLoaderText();
       onButtonLoaderShow()
     } else {
+      onButtonLoaderHide()
       hitsContainer.innerHTML = "";
       noImage()
     };
-    const { height: cardHeight } = hitsContainer.firstElementChild.getBoundingClientRect();
+    const element = hitsContainer.firstElementChild.getBoundingClientRect();
 
 window.scrollBy({
-  top: cardHeight * 2,
+  top: element.height,
   behavior: "smooth",
 });
     lightbox.refresh();
-    if (currentPage === availablePages) {
-      error.endOfSearch();
-      onButtonLoaderHide()
-    }
   } catch (error) {
     console.error(error)
   } 
