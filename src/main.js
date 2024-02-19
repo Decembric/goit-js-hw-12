@@ -77,6 +77,19 @@ function endOfCollections() {
       });
 };
 
+function logMessage(message) {
+   iziToast.show({
+        title: 'Error',
+        message,
+        titleSize: '16px',
+        titleLineHeight: '150%',
+        messageSize: '16px',
+        messageLineHeight: '150%',
+        backgroundColor: '#ef4040',
+        position: 'bottomRight',
+      });
+};
+
 async function onInputQuery(evt) {
   evt.preventDefault();
   const query = evt.currentTarget.elements.query.value.trim();
@@ -89,6 +102,7 @@ async function onInputQuery(evt) {
     };
     onShowLoader();
     currentQuery = query;
+    hitsContainer.innerHTML = "";
     const { hits, totalHits } = await getPicture(currentQuery, currentPage);
     if (totalHits > 0) {
       render(hits);
@@ -106,9 +120,11 @@ async function onInputQuery(evt) {
     else {
       hitsContainer.innerHTML = "";
       noImage();
+      loadMoreButtonRef.hidden = true;
     };
-  } catch (error) {
-    console.error(error);
+  } catch (message) {
+    onHideLoader()
+    logMessage(message);
   };
 };
 
@@ -124,12 +140,16 @@ window.scrollBy({
   behavior: "smooth",
 });
     lightbox.refresh();
+    
     if (Math.ceil(totalHits / imagePerPage) !== currentPage) {
-      loadMoreButtonRef.hidden = true;
       onHideLoader();
       endOfCollections();
-    } 
-  } catch (error) {
-    console.error(error);
+    } else {
+      loadMoreButtonRef.hidden = true;
+
+    }
+  } catch (message) {
+    onHideLoader()
+    logMessage(message);
   };
 };
