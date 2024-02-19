@@ -1,11 +1,4 @@
-import SimpleLightbox from "simplelightbox";
-import "simplelightbox/dist/simple-lightbox.min.css";
-const lightbox = new SimpleLightbox('.gallery a', {
-  captionDelay: 250,
-  captionsData: 'alt',
-  enableKeyboard: true,
-});
-import { hitsContainer } from "../main";
+import { hitsContainer, lightbox } from "../main";
 
 export default function render(hits) {
   const hitsRef = hits.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
