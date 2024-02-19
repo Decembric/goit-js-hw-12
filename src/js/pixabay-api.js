@@ -15,6 +15,5 @@ export default async function getPicture(query, page = 1) {
       safesearch: true,
     },
   });
-  console.log(response)
   return response.data;
 }

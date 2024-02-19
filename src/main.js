@@ -18,13 +18,23 @@ const formRef = document.querySelector('form');
 const loadMoreButtonRef = document.querySelector('.loader-button');
 const loaderRef = document.querySelector('.loader');
 
-const imagePerPage = 15
+
+const imagePerPage = 15;
 let currentQuery = '';
-let currentPage = 1
-let totalPages = undefined
+let currentPage = 1;
+let totalPages = undefined;
 
 
-loadMoreButtonRef.addEventListener('click', onLoadMore)
+
+function onShowLoader() {
+loaderRef.style.display = 'block';
+}
+
+function onHideLoader() {
+  loaderRef.style.display = 'none';
+}
+
+loadMoreButtonRef.addEventListener('click', onLoadMore);
 
 formRef.addEventListener('submit', onInputQuery);
 
@@ -39,7 +49,7 @@ iziToast.show({
       backgroundColor: '#ef4040',
       position: 'bottomRight',
     });
-}
+};
 
 function noImage() {
   iziToast.show({
@@ -52,7 +62,7 @@ function noImage() {
         backgroundColor: '#ef4040',
         position: 'bottomRight',
       });
-}
+};
 
 function endOfCollections() {
    iziToast.show({
@@ -65,55 +75,61 @@ function endOfCollections() {
         backgroundColor: '#ef4040',
         position: 'bottomRight',
       });
-}
+};
 
 async function onInputQuery(evt) {
   evt.preventDefault();
   const query = evt.currentTarget.elements.query.value.trim();
   try {
     if (query === '') {
-      hitsContainer.innerHTML = ""
+      hitsContainer.innerHTML = "";
       emptyQuery();
-      loadMoreButtonRef.hidden = true
+      loadMoreButtonRef.hidden = true;
       return
-    }
+    };
+    onShowLoader();
     currentQuery = query;
-    const { hits, totalHits } = await getPicture(currentQuery, currentPage)
+    const { hits, totalHits } = await getPicture(currentQuery, currentPage);
     if (totalHits > 0) {
       render(hits);
+      onHideLoader();
+      lightbox.refresh();
       const { height: cardHeight } = hitsContainer.getBoundingClientRect();
       window.scrollBy({
         top: cardHeight * 2,
         behavior: "smooth",
       });
       inputQueryRef.value = "";
-      loadMoreButtonRef.hidden = false
-      totalPages = Math.ceil(totalHits / imagePerPage)
+      loadMoreButtonRef.hidden = false;
+      totalPages = Math.ceil(totalHits / imagePerPage);
     }
     else {
-      hitsContainer.innerHTML = ""
-      noImage()
+      hitsContainer.innerHTML = "";
+      noImage();
     };
   } catch (error) {
-    console.error(error)
-  }
-}
+    console.error(error);
+  };
+};
 
 async function onLoadMore() {
   try {
+    onShowLoader()
     currentPage += 1;
-    const {hits, totalHits} = await getPicture(currentQuery, currentPage)
+    const { hits, totalHits } = await getPicture(currentQuery, currentPage);
     render(hits);
     const element = hitsContainer.firstElementChild.getBoundingClientRect();
 window.scrollBy({
   top: element.height,
   behavior: "smooth",
 });
+    lightbox.refresh();
     if (Math.ceil(totalHits / imagePerPage) !== currentPage) {
-      loadMoreButtonRef.hidden = true
-      endOfCollections()
+      loadMoreButtonRef.hidden = true;
+      onHideLoader();
+      endOfCollections();
     } 
   } catch (error) {
-    console.error(error)
-  } 
-}
+    console.error(error);
+  };
+};
