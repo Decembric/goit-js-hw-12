@@ -15,33 +15,13 @@ export {hitsContainer}
 const hitsContainer = document.querySelector('.gallery');
 const inputQueryRef = document.querySelector('input');
 const formRef = document.querySelector('form');
-const loadMoreButtonRef = document.querySelector('.js-load');
+const loadMoreButtonRef = document.querySelector('.loader-button');
 const loaderRef = document.querySelector('.loader');
 
+const imagePerPage = 15
 let currentQuery = '';
-let currentPage
-let availablePages = 0;
+let currentPage = 1
 
-// onHideLoaderText();
-
-// function onShowLoaderText() {
-//     loaderRef.style.display = 'block';
-    
-// }
-
-// function onHideLoaderText() {
-//     loaderRef.style.display = 'none';
-// }
-
-function onButtonLoaderShow() {
-  loadMoreButtonRef.style.display = 'block';
-}
-
-function onButtonLoaderHide() {
-  loadMoreButtonRef.style.display = 'none';
-}
-
-onButtonLoaderHide()
 
 loadMoreButtonRef.addEventListener('click', onLoadMore)
 
@@ -78,22 +58,21 @@ async function onInputQuery(evt) {
   const query = evt.currentTarget.elements.query.value.trim();
   try {
     if (query === '') {
+      hitsContainer.innerHTML = ""
       emptyQuery();
+      loadMoreButtonRef.hidden = true
       return
     }
     currentQuery = query;
-    currentPage = 1
     const { hits, totalHits } = await getPicture(currentQuery, currentPage)
+    
     inputQueryRef.value = "";
-    if (totalHits !== 0) {
-      render(hits);
+    loadMoreButtonRef.hidden = false
+    render(hits);
+    if (Math.ceil(totalHits / imagePerPage) <= currentPage) {
       lightbox.refresh()
-      onButtonLoaderShow()
-      availablePages = Math.ceil(totalHits / 15);
-    } else {
-      onButtonLoaderHide()
-      hitsContainer.innerHTML = "";
       noImage()
+     loadMoreButtonRef.hidden = true
     };
     const { height: cardHeight } = hitsContainer.getBoundingClientRect();
 window.scrollBy({
@@ -110,14 +89,14 @@ async function onLoadMore() {
     // onShowLoaderText()
     currentPage += 1;
     const {hits, totalHits} = await getPicture(currentQuery, currentPage)
-    if (totalHits !== 0) {
-      render(hits);
+    if (totalHits === currentPage) {
       // onHideLoaderText();
-      onButtonLoaderShow()
-    } else {
-      onButtonLoaderHide()
+      loadMoreButtonRef.hidden = true
       hitsContainer.innerHTML = "";
       noImage()
+    } else {
+      render(hits);
+      
     };
     const element = hitsContainer.firstElementChild.getBoundingClientRect();
 

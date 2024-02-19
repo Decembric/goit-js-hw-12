@@ -5,7 +5,6 @@
   |============================
 */
 @import url('./reset.css');
-@import url('./vite-promo.css');
 @import url('./header.css');
 
 :root {
@@ -33,6 +32,11 @@ p {
 form {
   margin-bottom: 100px;
 }
+/* 
+.loader-button {
+  display: none;
+} */
+
 .loader {
   width: 32px;
   height: 32px;

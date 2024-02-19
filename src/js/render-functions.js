@@ -1,6 +1,6 @@
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
-const lightbox = new SimpleLightbox('.gallery a', {
+const lightbox = new SimpleLightbox('.gallery', {
   captionDelay: 250,
   captionsData: 'alt',
   enableKeyboard: true,
@@ -8,7 +8,6 @@ const lightbox = new SimpleLightbox('.gallery a', {
 import { hitsContainer } from "../main";
 
 export default function render(hits) {
-  hitsContainer.innerHTML = '';
   const hitsRef = hits.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
     return `<ul>
         <li><a href="${largeImageURL}"><img src="${webformatURL}" alt="${tags}"/></a></li>
