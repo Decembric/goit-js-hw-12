@@ -21,6 +21,7 @@ const loaderRef = document.querySelector('.loader');
 const imagePerPage = 15
 let currentQuery = '';
 let currentPage = 1
+let totalPages = undefined
 
 
 loadMoreButtonRef.addEventListener('click', onLoadMore)
@@ -53,6 +54,19 @@ function noImage() {
       });
 }
 
+function endOfCollections() {
+   iziToast.show({
+        title: 'Error',
+        message: "We're sorry, but you've reached the end of search results.",
+        titleSize: '16px',
+        titleLineHeight: '150%',
+        messageSize: '16px',
+        messageLineHeight: '150%',
+        backgroundColor: '#ef4040',
+        position: 'bottomRight',
+      });
+}
+
 async function onInputQuery(evt) {
   evt.preventDefault();
   const query = evt.currentTarget.elements.query.value.trim();
@@ -65,46 +79,40 @@ async function onInputQuery(evt) {
     }
     currentQuery = query;
     const { hits, totalHits } = await getPicture(currentQuery, currentPage)
-    
-    inputQueryRef.value = "";
-    loadMoreButtonRef.hidden = false
-    render(hits);
-    if (Math.ceil(totalHits / imagePerPage) <= currentPage) {
-      lightbox.refresh()
+    if (totalHits > 0) {
+      render(hits);
+      const { height: cardHeight } = hitsContainer.getBoundingClientRect();
+      window.scrollBy({
+        top: cardHeight * 2,
+        behavior: "smooth",
+      });
+      inputQueryRef.value = "";
+      loadMoreButtonRef.hidden = false
+      totalPages = Math.ceil(totalHits / imagePerPage)
+    }
+    else {
+      hitsContainer.innerHTML = ""
       noImage()
-     loadMoreButtonRef.hidden = true
     };
-    const { height: cardHeight } = hitsContainer.getBoundingClientRect();
-window.scrollBy({
-  top: cardHeight * 2,
-  behavior: "smooth",
-});
   } catch (error) {
     console.error(error)
   }
 }
-    
+
 async function onLoadMore() {
   try {
-    // onShowLoaderText()
     currentPage += 1;
     const {hits, totalHits} = await getPicture(currentQuery, currentPage)
-    if (totalHits === currentPage) {
-      // onHideLoaderText();
-      loadMoreButtonRef.hidden = true
-      hitsContainer.innerHTML = "";
-      noImage()
-    } else {
-      render(hits);
-      
-    };
+    render(hits);
     const element = hitsContainer.firstElementChild.getBoundingClientRect();
-
 window.scrollBy({
   top: element.height,
   behavior: "smooth",
 });
-    lightbox.refresh();
+    if (Math.ceil(totalHits / imagePerPage) !== currentPage) {
+      loadMoreButtonRef.hidden = true
+      endOfCollections()
+    } 
   } catch (error) {
     console.error(error)
   } 
